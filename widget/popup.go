@@ -105,6 +105,7 @@ func (p *PopUp) CreateRenderer() fyne.WidgetRenderer {
 
 	p.ExtendBaseWidget(p)
 	background := canvas.NewRectangle(th.Color(theme.ColorNameOverlayBackground, v))
+	background.CornerRadius = th.Size(theme.SizeNameDialogRadius)
 	if p.modal {
 		underlay := canvas.NewRectangle(th.Color(theme.ColorNameShadow, v))
 		objects := []fyne.CanvasObject{underlay, background, p.Content}

@@ -106,8 +106,11 @@ func (w *InnerWindow) CreateRenderer() fyne.WidgetRenderer {
 		buttons = NewCenter(NewHBox(min, max, close))
 	}
 
+	cornerRadius := theme.Size(theme.SizeNameWindowRadius)
 	bg := canvas.NewRectangle(th.Color(theme.ColorNameOverlayBackground, v))
+	bg.CornerRadius = cornerRadius
 	contentBG := canvas.NewRectangle(th.Color(theme.ColorNameBackground, v))
+	contentBG.CornerRadius = cornerRadius
 	corner := newDraggableCorner(w)
 	bar := New(&titleBarLayout{buttons: buttons, icon: borderIcon, title: barMid, win: w},
 		buttons, borderIcon, barMid)

@@ -99,9 +99,11 @@ func (b *Button) CreateRenderer() fyne.WidgetRenderer {
 	text := NewRichText(seg)
 	text.inset = fyne.NewSquareSize(th.Size(theme.SizeNameInnerPadding))
 
+	cornerRadius := th.Size(theme.SizeNameButtonRadius)
 	background := canvas.NewRectangle(th.Color(theme.ColorNameButton, v))
-	background.CornerRadius = th.Size(theme.SizeNameInputRadius)
+	background.CornerRadius = cornerRadius
 	tapBG := canvas.NewRectangle(color.Transparent)
+	tapBG.CornerRadius = cornerRadius
 	b.tapAnim = newButtonTapAnimation(tapBG, b, th)
 	b.tapAnim.Curve = fyne.AnimationEaseOut
 	objects := []fyne.CanvasObject{
@@ -303,23 +305,19 @@ func (r *buttonRenderer) Refresh() {
 }
 
 // applyTheme updates this button to match the current theme
-// must be called with the button propertyLock RLocked
 func (r *buttonRenderer) applyTheme() {
 	th := r.button.Theme()
 	v := fyne.CurrentApp().Settings().ThemeVariant()
 	fgColorName, bgColorName, bgBlendName := r.buttonColorNames()
-	if bg := r.background; bg != nil {
-		bgColor := color.Color(color.Transparent)
-		if bgColorName != "" {
-			bgColor = th.Color(bgColorName, v)
-		}
-		if bgBlendName != "" {
-			bgColor = blendColor(bgColor, th.Color(bgBlendName, v))
-		}
-		bg.FillColor = bgColor
-		bg.CornerRadius = th.Size(theme.SizeNameInputRadius)
-		bg.Refresh()
+	bgColor := color.Color(color.Transparent)
+	if bgColorName != "" {
+		bgColor = th.Color(bgColorName, v)
 	}
+	if bgBlendName != "" {
+		bgColor = blendColor(bgColor, th.Color(bgBlendName, v))
+	}
+	r.background.FillColor = bgColor
+	r.background.Refresh()
 
 	r.label.Segments[0].(*TextSegment).Style.ColorName = fgColorName
 	r.label.Refresh()
@@ -379,7 +377,6 @@ func (r *buttonRenderer) padding(th fyne.Theme) fyne.Size {
 	return fyne.NewSquareSize(th.Size(theme.SizeNameInnerPadding) * 2)
 }
 
-// must be called with r.button.propertyLock RLocked
 func (r *buttonRenderer) updateIconAndText() {
 	if r.button.Icon != nil && !r.button.Hidden {
 		icon := r.button.Icon

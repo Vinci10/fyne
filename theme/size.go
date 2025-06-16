@@ -97,6 +97,51 @@ const (
 	//
 	// Since: 2.6
 	SizeNameWindowTitleBarHeight fyne.ThemeSizeName = "windowTitleBarHeight"
+
+	// SizeNameDialogRadius is the name of theme lookup for dialog corner radius.
+	//
+	// Since: 2.7
+	SizeNameDialogRadius fyne.ThemeSizeName = "dialogRadius"
+
+	// SizeNameMenuRadius is the name of theme lookup for menu corner radius.
+	//
+	// Since: 2.7
+	SizeNameMenuRadius fyne.ThemeSizeName = "menuRadius"
+
+	// SizeNameButtonRadius is the name of theme lookup for button corner radius.
+	//
+	// Since: 2.7
+	SizeNameButtonRadius fyne.ThemeSizeName = "buttonRadius"
+
+	// SizeNameWindowRadius is the name of theme lookup for inner window corner radius.
+	//
+	// Since: 2.7
+	SizeNameWindowRadius fyne.ThemeSizeName = "windowRadius"
+
+	// SizeNameProgressBarRadius is the name of theme lookup for progress bar corner radius.
+	//
+	// Since: 2.7
+	SizeNameProgressBarRadius fyne.ThemeSizeName = "progressBarRadius"
+
+	// SizeNameRadiusExtraSmall is the name of theme lookup for the radius with extra small corner rounding.
+	//
+	// Since: 2.7
+	SizeNameRadiusExtraSmall fyne.ThemeSizeName = "radiusExtraSmall"
+
+	// SizeNameRadiusSmall is the name of theme lookup for the radius with small corner rounding.
+	//
+	// Since: 2.7
+	SizeNameRadiusSmall fyne.ThemeSizeName = "radiusSmall"
+
+	// SizeNameRadiusMedium is the name of theme lookup for the radius with medium corner rounding.
+	//
+	// Since: 2.7
+	SizeNameRadiusMedium fyne.ThemeSizeName = "radiusMedium"
+
+	// SizeNameRadiusLarge is the name of theme lookup for the radius with large corner rounding.
+	//
+	// Since: 2.7
+	SizeNameRadiusLarge fyne.ThemeSizeName = "radiusLarge"
 )
 
 // CaptionTextSize returns the size for caption text.
@@ -227,19 +272,37 @@ func (t *builtinTheme) Size(s fyne.ThemeSizeName) float32 {
 	case SizeNameInputBorder:
 		return 1
 	case SizeNameInputRadius:
-		return 5
+		return t.Size(SizeNameRadiusExtraSmall)
 	case SizeNameSelectionRadius:
-		return 3
+		return t.Size(SizeNameRadiusExtraSmall)
 	case SizeNameScrollBarRadius:
-		return 3
+		return t.Size(SizeNameRadiusExtraSmall)
 	case SizeNameWindowButtonHeight:
 		return 16
 	case SizeNameWindowButtonRadius:
-		return 8
+		return t.Size(SizeNameRadiusSmall)
 	case SizeNameWindowButtonIcon:
 		return 14
 	case SizeNameWindowTitleBarHeight:
 		return 26
+	case SizeNameDialogRadius:
+		return t.Size(SizeNameRadiusLarge)
+	case SizeNameMenuRadius:
+		return t.Size(SizeNameRadiusExtraSmall)
+	case SizeNameButtonRadius:
+		return t.Size(SizeNameRadiusMedium)
+	case SizeNameWindowRadius:
+		return t.Size(SizeNameRadiusSmall)
+	case SizeNameProgressBarRadius:
+		return t.Size(SizeNameRadiusMedium)
+	case SizeNameRadiusExtraSmall:
+		return 4
+	case SizeNameRadiusSmall:
+		return 8
+	case SizeNameRadiusMedium:
+		return 12
+	case SizeNameRadiusLarge:
+		return 16
 
 	default:
 		return 0

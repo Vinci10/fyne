@@ -76,12 +76,12 @@ func (p *progressRenderer) applyTheme() {
 	v := fyne.CurrentApp().Settings().ThemeVariant()
 
 	primaryColor := th.Color(theme.ColorNamePrimary, v)
-	inputRadius := th.Size(theme.SizeNameInputRadius)
+	cornerRadius := th.Size(theme.SizeNameProgressBarRadius)
 
 	p.background.FillColor = progressBlendColor(primaryColor)
-	p.background.CornerRadius = inputRadius
+	p.background.CornerRadius = cornerRadius
 	p.bar.FillColor = primaryColor
-	p.bar.CornerRadius = inputRadius
+	p.bar.CornerRadius = cornerRadius
 	p.label.Color = th.Color(theme.ColorNameForegroundOnPrimary, v)
 	p.label.TextSize = th.Size(theme.SizeNameText)
 }
