@@ -199,12 +199,13 @@ func DrawSquare(sq *canvas.Square, rWidth, rHeight, vectorPad float32, scale fun
 }
 
 func drawOblong(fill, strokeCol color.Color, strokeWidth, topRightRadius, topLeftRadius, bottomRightRadius, bottomLeftRadius, rWidth, rHeight, vectorPad float32, scale func(float32) float32) *image.RGBA {
-	// The maximum possible corner radius for a circular shape
-	maxCornerRadius := GetMaximumRadius(fyne.NewSize(rWidth, rHeight))
-	topRightRadius = fyne.Min(maxCornerRadius, topRightRadius)
-	topLeftRadius = fyne.Min(maxCornerRadius, topLeftRadius)
-	bottomRightRadius = fyne.Min(maxCornerRadius, bottomRightRadius)
-	bottomLeftRadius = fyne.Min(maxCornerRadius, bottomLeftRadius)
+	// The maximum possible corner radii for a circular shape
+	maxWidthRadius := GetMaximumRadius(fyne.NewSquareSize(rWidth))
+	maxHeightRadius := GetMaximumRadius(fyne.NewSquareSize(rHeight))
+	topRightRadius = GetMaximumCornerRadius(topRightRadius, topLeftRadius, bottomRightRadius, maxWidthRadius, maxHeightRadius)
+	topLeftRadius = GetMaximumCornerRadius(topLeftRadius, topRightRadius, bottomLeftRadius, maxWidthRadius, maxHeightRadius)
+	bottomRightRadius = GetMaximumCornerRadius(bottomRightRadius, bottomLeftRadius, topRightRadius, maxWidthRadius, maxHeightRadius)
+	bottomLeftRadius = GetMaximumCornerRadius(bottomLeftRadius, bottomRightRadius, topLeftRadius, maxWidthRadius, maxHeightRadius)
 
 	width := int(scale(rWidth + vectorPad*2))
 	height := int(scale(rHeight + vectorPad*2))
@@ -621,11 +622,32 @@ func GetCornerRadius(perCornerRadius, baseCornerRadius float32) float32 {
 	return perCornerRadius
 }
 
-// GetMaximumRadius returns the maximum possible radius that fits within the given size.
+// GetMaximumRadius returns the maximum possible corner radius that fits within the given size.
 // It calculates half of the smaller dimension (width or height) of the provided fyne.Size.
-// This is typically used for drawing circular corners in rectangles, circles or squares.
+//
+// This is typically used for drawing circular corners in rectangles, circles or squares with the same radius for all corners.
 func GetMaximumRadius(size fyne.Size) float32 {
 	return fyne.Min(size.Height, size.Width) / 2
+}
+
+// GetMaximumCornerRadius returns the maximum possible corner radius for an individual corner,
+// considering the specified corner radius, the radii of adjacent corners, and the maximum radii
+// allowed for the width and height of the shape. Corner radius may utilize unused capacity from adjacent corners with radius smaller than maximum value
+// so this corner can grow up to double the maximum radius of the smaller dimension (width or height) without causing overlaps.
+//
+// This is typically used for drawing circular corners in rectangles or squares with different corner radii.
+func GetMaximumCornerRadius(radius, adjacentWidthRadius, adjacentHeightRadius, maxWidthRadius, maxHeightRadius float32) float32 {
+	// fast path: corner radius fits within both per-axis maxima
+	if radius <= fyne.Min(maxWidthRadius, maxHeightRadius) {
+		return radius
+	}
+	// expand per-axis limits by borrowing any unused capacity from adjacent corners
+	expandedMaxWidthRadius := 2*maxWidthRadius - fyne.Min(maxWidthRadius, adjacentWidthRadius)
+	expandedMaxHeightRadius := 2*maxHeightRadius - fyne.Min(maxHeightRadius, adjacentHeightRadius)
+
+	// respect the smaller axis and never exceed the requested radius
+	expandedMaxRadius := fyne.Min(expandedMaxWidthRadius, expandedMaxHeightRadius)
+	return fyne.Min(expandedMaxRadius, radius)
 }
 
 // GetMaximumRadiusArc returns the maximum possible corner radius for an arc segment based on the outer radius,
@@ -634,6 +656,7 @@ func GetMaximumRadius(size fyne.Size) float32 {
 func GetMaximumRadiusArc(outerRadius, innerRadius, sweepAngle float32) float32 {
 	// height (thickness), width (length)
 	thickness := outerRadius - innerRadius
+	// TODO: length formula can be improved to get a fully rounded (pill shape) outer edge for thin (small sweep) arc segments
 	span := math.Sin(0.5 * math.Min(math.Abs(float64(sweepAngle))*math.Pi/180.0, math.Pi)) // span in (0,1)
 	length := 1.5 * float64(outerRadius) * span / (1 + span)                               // no division-by-zero risk
 
